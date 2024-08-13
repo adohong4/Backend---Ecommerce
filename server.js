@@ -1,6 +1,7 @@
 const app = require("./src/app");
+require('dotenv').config();
 
-const PORT = 3055;
+const PORT = process.env.PORT;
 
 const server = app.listen(PORT, () => {
     console.log(`WSV eCommerce start with ${PORT}`)

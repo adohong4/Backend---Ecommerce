@@ -1,7 +1,9 @@
 'use strict'
 
 const mongoose = require('mongoose')
-const connectString = `mongodb+srv://shopDEV:hhjkweqbvfx8@microservices.rzno6.mongodb.net/?retryWrites=true&w=majority&appName=Microservices`
+require('dotenv').config();
+
+const connectString = process.env.MONGO_CONNECTION_STRING
 const { countConnect } = require('../helpers/check.connect')
 
 class Database {
