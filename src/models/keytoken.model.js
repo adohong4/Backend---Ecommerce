@@ -21,9 +21,10 @@ var keyTokenSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    refreshToken: {
-        type: Array, default: []
+    refreshTokensUsed: {
+        type: Array, default: []  //refresh token used
     },
+    refreshToken: { type: String, required: true }
 }, {
     collection: COLLECTION_NAME,
     timestamps: true
