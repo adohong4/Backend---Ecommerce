@@ -7,16 +7,6 @@ class KeyTokenService {
 
     static createKeyToken = async ({ userId, publicKey, privateKey, refreshToken }) => {
         try {
-            //level 0
-            // const tokens = await keyTokenModel.create({
-            //     user: userId,
-            //     publicKey,
-            //     privateKey
-            // })
-
-            // return tokens ? tokens.publicKey : null
-
-
             //level xxx
             const filter = { user: userId }, update = {
                 publicKey, privateKey, refreshTokensUsed: [], refreshToken
@@ -37,6 +27,19 @@ class KeyTokenService {
     static removeTokenById = async ({ id }) => {
         return await keytokenModel.deleteOne({ _id: new ObjectId(id) });
     }
+
+    static findByRefreshTokenUsed = async (refreshToken) => {
+        return await keytokenModel.findOne({ refreshTokensUsed: refreshToken }).lean();
+    }
+
+    static findByRefreshToken = async (refreshToken) => {
+        return await keytokenModel.findOne({ refreshToken })
+    }
+
+    static deleteKeyById = async (userId) => {
+        return await keytokenModel.findByIdAndDelete({ user: userId })
+    }
+
 }
 
 module.exports = KeyTokenService;

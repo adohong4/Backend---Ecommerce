@@ -51,7 +51,7 @@ const authentication = asyncHandler(async (req, res, next) => {
     */
 
     // 1
-    const userId = req.headers[HEADER.CLIENT_ID]
+    const userId = req.headers[HEADER.CLIENT_ID]?.toString()
     if (!userId) throw new AuthFailureError('Invalid Request UserId')
 
 
@@ -59,7 +59,7 @@ const authentication = asyncHandler(async (req, res, next) => {
     const keyStore = await findByUserId(userId)
     if (!keyStore) throw new NotFoundError('Not found keyStore')
     //3
-    const accessToken = req.headers[HEADER.AUTHORIZATION]
+    const accessToken = req.headers[HEADER.AUTHORIZATION]?.toString()
     if (!accessToken) throw new AuthFailureError('Invalid Requested')
 
     try {
@@ -74,7 +74,12 @@ const authentication = asyncHandler(async (req, res, next) => {
 
 })
 
+const verifyJWT = async (token, keySecret) => {
+    return await JWT.verify(token, keySecret)
+}
+
 module.exports = {
     createTokenPair,
-    authentication
+    authentication,
+    verifyJWT
 }
