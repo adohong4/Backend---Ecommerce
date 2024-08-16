@@ -9,7 +9,8 @@ const { findByUserId } = require('../services/keyToken.service')
 const HEADER = {
     API_KEY: 'x-api-key',
     CLIENT_ID: 'x-client-id',
-    AUTHORIZATION: 'authorization'
+    AUTHORIZATION: 'authorization',
+    REFRESHTOKEN: 'x-rtoken-id'
 }
 
 const createTokenPair = async (payload, publicKey, privateKey) => {
@@ -70,8 +71,52 @@ const authentication = asyncHandler(async (req, res, next) => {
     } catch (error) {
         throw error
     }
+})
+
+const authenticationV2 = asyncHandler(async (req, res, next) => {
+    /*
+        1- check userId missing???
+        2- get AccessToken
+        3- verifyToken
+        4- check user in bds?
+        5- chech keyStore with this userId?
+        6- OK all => return next()
+    */
+
+    // 1
+    const userId = req.headers[HEADER.CLIENT_ID]?.toString()
+    if (!userId) throw new AuthFailureError('Invalid Request UserId')
 
 
+    //2
+    const keyStore = await findByUserId(userId)
+    if (!keyStore) throw new NotFoundError('Not found keyStore')
+    //3
+    const refreshToken = req.headers[HEADER.REFRESHTOKEN]?.toString()
+    if (req.headers[HEADER.REFRESHTOKEN]) {
+        try {
+            const decodeUser = JWT.verify(refreshToken, keyStore.publicKey)
+            if (userId !== decodeUser.userId) throw new AuthFailureError('Invalid Userid')
+            req.keyStore = keyStore
+            req.user = decodeUser
+            req.refreshToken = refreshToken
+            return next()
+        } catch (error) {
+            throw error
+        }
+    }
+
+    const accessToken = req.headers[HEADER.AUTHORIZATION]?.toString()
+    if (!accessToken) throw new AuthFailureError('Invalid Requested')
+
+    try {
+        const decodeUser = JWT.verify(accessToken, keyStore.publicKey)
+        if (userId !== decodeUser.userId) throw new AuthFailureError('Invalid Userid')
+        req.keyStore = keyStore
+        return next()
+    } catch (error) {
+        throw error
+    }
 })
 
 const verifyJWT = async (token, keySecret) => {
@@ -81,5 +126,6 @@ const verifyJWT = async (token, keySecret) => {
 module.exports = {
     createTokenPair,
     authentication,
-    verifyJWT
+    verifyJWT,
+    authenticationV2
 }
