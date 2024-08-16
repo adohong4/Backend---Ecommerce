@@ -6,7 +6,7 @@ const {
     findAllDraftsForShop, publishProductByshop, findAllPulishForShop,
     unPublishProductByshop, searchProductsByUser, findAllProducts,
     findProduct, updateProductById } = require('../models/repositories/product.repo')
-const { removeUnderfinedObject } = require('../utils')
+const { removeUnderfinedObject, updateNestedObjectParser } = require('../utils')
 
 //define Factory class to create product
 class ProductFactory {
@@ -118,16 +118,18 @@ class Clothing extends Product {
 
     async updateProduct(productId) {
         //1. remove attr has null undefined
-        console.log(`[1]::`, this)
         const objectParams = removeUnderfinedObject(this)
-        console.log(`[2]::`, objectParams)
         //2. check update in where?
         if (objectParams.product_attributes) {
             //update child
-            await updateProductById({ productId, objectParams, model: clothingModel })
+            await updateProductById({
+                productId,
+                bodyUpdate: updateNestedObjectParser(objectParams.product_attributes),
+                model: clothingModel
+            })
         }
 
-        const updateProduct = await super.updateProduct(productId, objectParams)
+        const updateProduct = await super.updateProduct(productId, updateNestedObjectParser(objectParams))
         return updateProduct
     }
 }
