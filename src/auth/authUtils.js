@@ -74,15 +74,6 @@ const authentication = asyncHandler(async (req, res, next) => {
 })
 
 const authenticationV2 = asyncHandler(async (req, res, next) => {
-    /*
-        1- check userId missing???
-        2- get AccessToken
-        3- verifyToken
-        4- check user in bds?
-        5- chech keyStore with this userId?
-        6- OK all => return next()
-    */
-
     // 1
     const userId = req.headers[HEADER.CLIENT_ID]?.toString()
     if (!userId) throw new AuthFailureError('Invalid Request UserId')
@@ -92,15 +83,18 @@ const authenticationV2 = asyncHandler(async (req, res, next) => {
     const keyStore = await findByUserId(userId)
     if (!keyStore) throw new NotFoundError('Not found keyStore')
     //3
-    const refreshToken = req.headers[HEADER.REFRESHTOKEN]?.toString()
+
     if (req.headers[HEADER.REFRESHTOKEN]) {
         try {
-            const decodeUser = JWT.verify(refreshToken, keyStore.publicKey)
+            const refreshToken = req.headers[HEADER.REFRESHTOKEN]?.toString()
+            const decodeUser = JWT.verify(refreshToken, keyStore.privateKey)
             if (userId !== decodeUser.userId) throw new AuthFailureError('Invalid Userid')
             req.keyStore = keyStore
-            req.user = decodeUser
+            req.user = decodeUser //userId && email
             req.refreshToken = refreshToken
+            console.log("DECODE: ", decodeUser);
             return next()
+
         } catch (error) {
             throw error
         }

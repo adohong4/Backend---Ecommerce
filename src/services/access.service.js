@@ -23,7 +23,7 @@ class AccessService {
     /*
         check token used?
     */
-    static handlerRefreshTokenV2 = async (keyStore, user, refreshToken) => {
+    static handlerRefreshTokenV2 = async ({ keyStore, user, refreshToken }) => {
 
         const { userId, email } = user;
 
@@ -35,7 +35,7 @@ class AccessService {
         if (keyStore.refreshToken !== refreshToken) throw new AuthFailureError('Shop not registered!')
 
         const foundShop = await findByEmail({ email })
-        if (!foundShop) throw new AuthFailureError('Shop not registered! 2')
+        if (!foundShop) throw new AuthFailureError('Shop not registered! ')
 
         //created pairToken
         const tokens = await createTokenPair({ userId, email }, keyStore.publicKey, keyStore.privateKey)
