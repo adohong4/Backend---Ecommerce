@@ -1,7 +1,8 @@
 'use strict'
 
 const { productModel, clothingModel, electronicModel, furnitureModel } = require('../models/product.model')
-const { BadRequestError, ConflictRequestError, AuthFailureError, ForbiddenError } = require("../core/error.response")
+const { BadRequestError, ForbiddenError } = require("../core/error.response")
+const { findAllDraftsForShop } = require('../models/repositories/product.repo')
 
 //define Factory class to create product
 class ProductFactory {
@@ -20,8 +21,14 @@ class ProductFactory {
 
         return new productClass(payload).createProduct()
     }
-}
 
+    ///query ///
+
+    static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }) {
+        const query = { product_shop, isDraft: true }
+        return await findAllDraftsForShop({ query, limit, skip })
+    }
+}
 //define base product class
 class Product {
     constructor({
