@@ -2,7 +2,7 @@
 
 const { productModel, clothingModel, electronicModel, furnitureModel } = require('../models/product.model')
 const { BadRequestError, ForbiddenError } = require("../core/error.response")
-const { findAllDraftsForShop } = require('../models/repositories/product.repo')
+const { findAllDraftsForShop, publishProductByshop, findAllPulishForShop, unPublishProductByshop } = require('../models/repositories/product.repo')
 
 //define Factory class to create product
 class ProductFactory {
@@ -22,11 +22,26 @@ class ProductFactory {
         return new productClass(payload).createProduct()
     }
 
-    ///query ///
+    // PUT // 
+    static async publishProductByShop({ product_shop, product_id }) {
+        return await publishProductByshop({ product_shop, product_id })
+    }
 
+    static async unPublishProductByShop({ product_shop, product_id }) {
+        return await unPublishProductByshop({ product_shop, product_id })
+    }
+    // END PUT //
+
+
+    /// QUERY ///
     static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }) {
         const query = { product_shop, isDraft: true }
         return await findAllDraftsForShop({ query, limit, skip })
+    }
+
+    static async findAllPublishForShop({ product_shop, limit = 50, skip = 0 }) {
+        const query = { product_shop, isPublished: true }
+        return await findAllPulishForShop({ query, limit, skip })
     }
 }
 //define base product class
