@@ -72,6 +72,13 @@ class ProductController {
             })
         }).send(res)
     }
+
+    getListSearchProduct = async (req, res, next) => {
+        new SuccessResponse({
+            message: 'Get list Search product!',
+            metadata: await ProductServiceV2.searchProducts(req.params)
+        }).send(res)
+    }
     /// END QUERY ///
 }
 
