@@ -43,9 +43,21 @@ const electronicSchema = new Schema({
     timestamps: true
 })
 
+// define the product type = furniture
+const furnitureSchema = new Schema({
+    brand: { type: String, require: true },
+    size: String,
+    material: String,
+    product_shop: { type: Schema.Types.ObjectId, ref: 'Shop' },
+}, {
+    collection: 'furnitures',
+    timestamps: true
+})
+
 const productModel = mongoose.model.product || mongoose.model(DOCUMENT_NAME, productSchema);
 const clothingModel = mongoose.model.clothing || mongoose.model('Clothing', clothingSchema);
 const electronicModel = mongoose.model.electronic || mongoose.model('Electronics', electronicSchema);
+const furnitureModel = mongoose.model.furniture || mongoose.model('Furniture', furnitureSchema);
 
 //Export the model
-module.exports = { productModel, clothingModel, electronicModel };
+module.exports = { productModel, clothingModel, electronicModel, furnitureModel };
